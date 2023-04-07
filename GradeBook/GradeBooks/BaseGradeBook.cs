@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-
 using GradeBook.Enums;
 using System.Collections.Generic;
 using System.IO;
@@ -12,17 +11,18 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace GradeBook.GradeBooks
 {
-    public class BaseGradeBook
+    public abstract class BaseGradeBook
     {
         public string Name { get; set; }
         public List<Student> Students { get; set; }
         public GradeBookType Type { get; set; }
         public List<Student> Students2 { get; set; }
-
-        public BaseGradeBook(string name)
+        public bool IsWeighted { get; set; }
+        public BaseGradeBook(string name, bool isWeight)
         {
             Name = name;
             Students = new List<Student>();
+            IsWeighted = isWeight;
         }
 
         public void AddStudent(Student student)
@@ -114,7 +114,14 @@ namespace GradeBook.GradeBooks
             switch (letterGrade)
             {
                 case 'A':
-                    return 4;
+                    if (studentType != StudentType.Standard && IsWeighted)
+                    {
+                        return 5;
+                    }
+                    else
+                    {
+                        return 4;
+                    }
                 case 'B':
                     return 3;
                 case 'C':
@@ -253,7 +260,8 @@ namespace GradeBook.GradeBooks
                     gradeBookType = "Standard";
                 else
                     gradeBookType = Enum.GetName(gradebookEnum, int.Parse(gradeBookType));
-            }
+            }   
+
 
             // Get GradeBook from the GradeBook.GradeBooks namespace
             var gradebook = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
